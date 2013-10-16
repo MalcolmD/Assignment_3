@@ -9,21 +9,28 @@ class MoviesController < ApplicationController
   def index
     @sort = params[:sort]
     @all_ratings = ['G', 'PG', 'PG-13']
-    
-    if(@selected_ratings.nil?)
-      @selected_ratings = @all_ratings
-    else
-      @selected_ratings = @selected_ratings.keys
-    end
+    @selected_ratings = ['']
     
 
-    if params[:sort].nil?
-      @movies = Movie.find_all_by_rating(:ratings)#where("rating IN (?)", params[:ratings]):rating => @selected_ratings)
-    else
-      @movies = Movie.order("#{@sort} ASC").find_all_by_rating(:ratings)#where("rating IN (?)", params[:ratings])#rating => @selected_ratings)
+  if(@sort.nil?)                            #If not sorted
+    if (params[:ratings].nil?)                      #If not rating filtered
+      @selected_ratings = @all_ratings
+      @movies = Movie.all
+    else                                            #If rating filtered
+      @selected_ratings = params[:ratings]
+      @movies = Movie.where("rating IN (?)", @selected_ratings)
     end
-  
+  else                                              #If sorted
+     if (params[:ratings].nil?)                     #If not rating filtered
+      @selected_ratings = @all_ratings
+      @movies = Movie.order("#{@sort} ASC")
+    else                                            #If rating filtered
+      @selected_ratings = params[:ratings]
+      @movies = Movie.order("#{@sort} ASC").where("rating IN (?)", @selected_ratings)
+    end
   end
+end
+
 
 
   def new
