@@ -7,39 +7,39 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = ['G', 'PG', 'PG-13']
+    @all_ratings = ['G', 'PG', 'PG-13', 'R']
     @selected_ratings = ['']
     
-    if session[:sort] != params[:sort] and !params[:sort].nil?
-      session[:sort] = params[:sort]
+    if session[:sort] != params[:sort] and !params[:sort].nil?            #If session was not sorted the same as params and params is sorted
+      session[:sort] = params[:sort]                                      #The session will persist the sorted params
     end
     
-    if session[:ratings] != params[:ratings] and !params[:ratings].nil?
-      session[:ratings] = params[:ratings]
-    end
+    if session[:ratings] != params[:ratings] and !params[:ratings].nil?   #If the session rating filter was not the same as params rating filter and params is not filtered
+      session[:ratings] = params[:ratings]                                #The session ratings filter will persist the rating filtered params
+    end 
     
-    if params[:sort].nil? and params[:ratings].nil? and (!session[:sort].nil? or !session[:ratings].nil?)
-      redirect_to(movies_path(:sort => session[:sort], :ratings => session[:ratings]))
+    if params[:sort].nil? and params[:ratings].nil? and (!session[:sort].nil? or !session[:ratings].nil?) #If params weren't sorted and there was no rating filter and the session had a filter or was sorted
+      redirect_to(movies_path(:sort => session[:sort], :ratings => session[:ratings]))                    #Redirect the state back to the session
     end
-    @sorted_by = session[:sort]
-    @selected_ratings = session[:ratings]
+    @sorted_by = session[:sort]                                           #Contains the last known sorting "state" 
+    @selected_ratings = session[:ratings]                                 #Contains the last known ratings filter "state"
 
-    if @sorted_by.nil?
-      @movies = Movie.all
+    if @sorted_by.nil?                                                    #If last known sorting "state" was none
+      @movies = Movie.all                                                 #All movies in db
     else
-      @movies = Movie.order(@sorted_by)
-    end
-
-    if @selected_ratings.nil?
-      @selected_ratings = @all_ratings
-    else
-      @selected_ratings = @selected_ratings.keys
+      @movies = Movie.order(@sorted_by)                                   #Sort by las known sorting "state"
     end
 
-    if @sorted_by.nil?
-       @movies = Movie.find_all_by_rating(@selected_ratings)
+    if @selected_ratings.nil?                                             #If last known session ratings filter was none
+      @selected_ratings = @all_ratings                                    #Keep that state
     else
-       @movies = Movie.order(@sorted_by).find_all_by_rating(@selected_ratings)
+      @selected_ratings = @selected_ratings.keys                          #Grab the current ratings filter "state"
+    end
+
+    if @sorted_by.nil?                                                    #If last knonwn sorting "state" was none
+       @movies = Movie.find_all_by_rating(@selected_ratings)              #Filter by last known ratings filter "state"
+    else
+       @movies = Movie.order(@sorted_by).find_all_by_rating(@selected_ratings)  #Filter and order by last known ratings filter "state" and last sorting "state"
     end
  end
 
