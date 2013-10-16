@@ -7,28 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @sort = params[:sort]
-    @all_ratings = ['G', 'PG', 'PG-13']
-    
-    if(params[:ratings] != nil)
-      @selected_ratings = params[:ratings]
-    else
-      @selected_ratings = @all_ratings
-    end
-    
-    if params[:sort].nil?
-      @movies = Movie.all
-    else
-      @movies  = Movie.order("#{@sort} ASC").all
-    end
-  
+    @movies = Movie.all
   end
-
-
 
   def sort 
     @movies = Movie.order("title ASC")
-    redirect_to movies_path
+    redirect_to movie_path
   end
 
   def new
