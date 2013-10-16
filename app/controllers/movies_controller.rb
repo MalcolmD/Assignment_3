@@ -10,26 +10,21 @@ class MoviesController < ApplicationController
     @sort = params[:sort]
     @all_ratings = ['G', 'PG', 'PG-13']
     
-    if(params[:ratings] != nil)
-      @selected_ratings = params[:ratings]
-    else
+    if(@selected_ratings.nil?)
       @selected_ratings = @all_ratings
+    else
+      @selected_ratings = @selected_ratings.keys
     end
     
+
     if params[:sort].nil?
-      @movies = Movie.all
+      @movies = Movie.find_all_by_rating(:ratings)#where("rating IN (?)", params[:ratings]):rating => @selected_ratings)
     else
-      @movies  = Movie.order("#{@sort} ASC").all
+      @movies = Movie.order("#{@sort} ASC").find_all_by_rating(:ratings)#where("rating IN (?)", params[:ratings])#rating => @selected_ratings)
     end
   
   end
 
-
-
-  def sort 
-    @movies = Movie.order("title ASC")
-    redirect_to movies_path
-  end
 
   def new
     # default: render 'new' template
